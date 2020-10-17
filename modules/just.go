@@ -1,4 +1,4 @@
-package hell
+package hello
 
 import (
 	"net/http"
@@ -6,5 +6,5 @@ import (
   )
 
 func SayHello(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"data": "hello world"})    
+	c.JSON(http.StatusOK, gin.H{"data": "Api Working OK!!!"})    
 }
