@@ -26,7 +26,12 @@ func LoginResult(c *gin.Context) {
 	log.Println("====== Get All Users ======")
 	var u userParams
 	if err := c.ShouldBindWith(&u, binding.JSON); err == nil {
-		c.JSON(http.StatusOK, usermodel.LoginResult(dbconnection.DbCon, u.Username, u.Password))
+		result := usermodel.LoginResult(dbconnection.DbCon, u.Username, u.Password)
+		if result != nil {
+			c.JSON(http.StatusOK, gin.H{"error": nil, "data": result})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"error": "User Not Found", "data": nil})
+		}
 	} else {
 		log.Println(err)
 	}
