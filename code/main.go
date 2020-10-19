@@ -2,16 +2,16 @@ package main
 
 import (
 	hello "github.com/anshumanpatil/goserver-print-api"
-	dbConnection "github.com/anshumanpatil/goserver-print-api/database"
-	userController "github.com/anshumanpatil/goserver-print-api/userController"
+	dbconnection "github.com/anshumanpatil/goserver-print-api/database"
+	usercontroller "github.com/anshumanpatil/goserver-print-api/userController"
 	"github.com/gin-gonic/gin"
-  )
-  
-func main () {
-	dbConnection.DbConnect()
+)
+
+func main() {
+	dbconnection.DbConnect()
 	r := gin.Default()
 	r.GET("/", hello.SayHello)
-	r.GET("/login", userController.LoginResult)
-	r.GET("/getAllUsers", userController.AllUsers)
+	r.POST("/login", usercontroller.LoginResult)
+	r.POST("/getAllUsers", usercontroller.AllUsers)
 	r.Run(":5656")
 }
