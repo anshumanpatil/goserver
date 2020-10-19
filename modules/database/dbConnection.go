@@ -1,24 +1,30 @@
-package dbConnection
+package dbconnection
 
 import (
-    "log"
-    "database/sql"
-    _ "github.com/go-sql-driver/mysql"
+	"database/sql"
+	"log"
+
+	// for mysql driver
+	_ "github.com/go-sql-driver/mysql"
 )
 
+// DbCon - database connection
 var DbCon *sql.DB
+
+// DBError - database connection error
 var DBError error
 
-
-func DbConnect(){
-    log.Println("====== Starting Database MySQL ======")
+// DbConnect - to connect database
+func DbConnect() {
+	log.Println("====== Starting Database MySQL ======")
 	DbCon, DBError = sql.Open("mysql", "root@tcp(127.0.0.1:3307)/go_print")
 	if DBError != nil {
-        panic(DBError.Error())
-    }
+		panic(DBError.Error())
+	}
 }
 
-func DbDisConnect(){
-    log.Println("====== Stopping Database MySQL ======")
-    DbCon.Close()
+// DbDisConnect - to disconnect database
+func DbDisConnect() {
+	log.Println("====== Stopping Database MySQL ======")
+	DbCon.Close()
 }
