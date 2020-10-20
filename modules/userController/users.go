@@ -5,14 +5,14 @@ import (
 	"net/http"
 
 	dbconnection "github.com/anshumanpatil/goserver-print-api/database"
+	helperfunctions "github.com/anshumanpatil/goserver-print-api/helper"
 	usermodel "github.com/anshumanpatil/goserver-print-api/models"
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 )
 
 type userParams struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 // AllUsers is - For generating login
@@ -23,16 +23,19 @@ func AllUsers(c *gin.Context) {
 
 // LoginResult is - For generating login
 func LoginResult(c *gin.Context) {
-	log.Println("====== Get All Users ======")
+	log.Println("====== Get Login Status of User ======")
 	var u userParams
-	if err := c.ShouldBindWith(&u, binding.JSON); err == nil {
-		result := usermodel.LoginResult(dbconnection.DbCon, u.Username, u.Password)
-		if result != nil {
-			c.JSON(http.StatusOK, gin.H{"error": nil, "data": result})
-		} else {
-			c.JSON(http.StatusOK, gin.H{"error": "User Not Found", "data": nil})
+	if err := c.ShouldBindJSON(&u); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	result := usermodel.LoginResult(dbconnection.DbCon, u.Username, u.Password)
+	if result != nil {
+		if token, err := helperfunctions.GenerateToken(result[0].ID); err == nil {
+			c.JSON(http.StatusOK, gin.H{"error": nil, "data": result, "token": token})
 		}
 	} else {
-		log.Println(err)
+		c.JSON(http.StatusLocked, gin.H{"error": "User Not Found", "data": nil})
 	}
 }
