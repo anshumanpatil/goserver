@@ -18,6 +18,10 @@ type userParams struct {
 // AllUsers is - For generating login
 func AllUsers(c *gin.Context) {
 	log.Println("====== Get All Users ======")
+	log.Println("================================================================================================")
+	db := c.MustGet("DB")
+	log.Print(db)
+	log.Println("================================================================================================")
 	c.JSON(http.StatusOK, usermodel.GetAllUsers(dbconnection.DbCon))
 }
 

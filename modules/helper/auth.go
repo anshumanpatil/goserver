@@ -1,10 +1,14 @@
 package helperfunctions
 
 import (
+	"fmt"
+	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 // TokenDetails - token generated for user
@@ -50,4 +54,41 @@ func GenerateToken(userid int) (*TokenDetails, error) {
 	}
 	return td, nil
 
+}
+
+// AuthMiddleware - Middleware for every call
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		os.Setenv("ACCESS_SECRET", "jdnfksdmfksd")
+		if strings.Contains(c.Request.URL.Path, "login") {
+			c.Next()
+			return
+		}
+		log.Println("AuthMiddleware=============================================================")
+		token := c.Request.Header.Get("Authorization")
+		sanitizedToken := strings.Replace(token, "Bearer ", "", 1)
+		if tokenn, err := VerifyToken(sanitizedToken); err == nil {
+			c.Set("user", tokenn)
+		}
+
+		c.Next()
+	}
+}
+
+// VerifyToken - verify token for every call
+func VerifyToken(tokenString string) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(os.Getenv("ACCESS_SECRET")), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		log.Println(claims["user_id"], claims["exp"])
+		return claims, nil
+	}
+	return nil, nil
 }
